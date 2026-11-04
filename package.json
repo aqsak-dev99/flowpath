@@ -1,0 +1,37 @@
+{
+  "name": "flowpath",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "tsx tests/api.test.ts && tsx evals/retrieval.ts",
+    "dev:api": "DATABASE_URL=memory ADMIN_PASSWORD=admin12345 SESSION_SECRET=local-dev-secret-0123456789 LLM_API_KEY=${LLM_API_KEY:-offline} tsx scripts/dev-api.ts",
+    "eval": "tsx evals/run.ts",
+    "eval:retrieval": "tsx evals/retrieval.ts"
+  },
+  "dependencies": {
+    "lucide-react": "^0.456.0",
+    "pg": "^8.23.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.6"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vercel/node": "^20.0.0",
+    "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.4.20",
+    "pg-mem": "^3.0.14",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "tsx": "^4.23.15",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}
