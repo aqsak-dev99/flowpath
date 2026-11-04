@@ -404,7 +404,44 @@ export function CtaBand() {
 
 /* ---------- Contact form ---------- */
 
-/** The form posts to /api/contact, which saves the enquiry in the database (see api/contact.ts). */
+/** The form posts to /api/contact, which saves the enquiry in the database (see api/contact.ts).
+ *  It also hands a copy to AutoHub, flowpath's AI assistant (a separate app), which drafts and
+ *  fact-checks a reply that visitors can watch arrive on AutoHub's public demo. */
+
+/** Where AutoHub runs. Override with VITE_AUTOHUB_URL in Vercel's environment variables. */
+export const AUTOHUB_URL = (import.meta.env.VITE_AUTOHUB_URL as string | undefined) || 'https://autohub-0igb.onrender.com'
+
+/** Sample enquiries for people trying the demo, in AutoHub's four languages. */
+const SAMPLES = [
+  { name: 'Sana', company: 'Libas by Sana', budget: 1,
+    message: "Hi! We sell clothes online and want Instagram and Meta ads to grow sales. We'd like to start next month. Can we get on a call?" },
+  { name: 'Bilal', company: 'Lakeview Bakery', budget: 0,
+    message: 'Salam, hamari bakery ke liye Instagram content aur ads chahiye. Budget lagbhag 1 lakh mahana hai. Kab start kar sakte hain?' },
+  { name: 'Ayesha', company: 'Koel Beauty', budget: 2,
+    message: 'السلام علیکم، ہمیں اپنے اسکن کیئر برانڈ کے لیے گوگل اشتہارات اور ایس ای او چاہیے۔ آپ کی فیس کیا ہے؟' },
+  { name: 'Khalid', company: 'Oud House', budget: 2,
+    message: 'مرحبا، نحن متجر عطور في لاهور ونرغب في إعلانات على إنستغرام. ما هي تكلفة خدماتكم؟' },
+]
+
+/** Send the enquiry on to AutoHub. Best effort: it must never slow down or break flowpath's own form. */
+function sendToAutoHub(data: FormData) {
+  const budget = String(data.get('budget') || '')
+  const message = String(data.get('message') || '').trim()
+  fetch(`${AUTOHUB_URL}/api/forms/contact`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    keepalive: true, // still delivered if the visitor leaves the page
+    body: JSON.stringify({
+      name: String(data.get('name') || '').trim(),
+      email: String(data.get('email') || '').trim(),
+      company: String(data.get('company') || '').trim() || undefined,
+      message: budget ? `${message}\n\nMonthly budget: ${budget}` : message,
+      website: String(data.get('website') || ''), // the honeypot, passed through so AutoHub ignores bots too
+    }),
+  }).catch(() => {
+    /* AutoHub asleep or down: flowpath has already saved the enquiry, so nothing is lost */
+  })
+}
 
 export function ContactForm() {
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -412,6 +449,25 @@ export function ContactForm() {
   const [failure, setFailure] = useState('')
   const [name, setName] = useState('')
   const sentRef = useRef<HTMLDivElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
+
+  /** Fill the form with a sample enquiry and a fresh made-up address (example.com never reaches an inbox). */
+  const fillSample = () => {
+    const form = formRef.current
+    if (!form) return
+    const sample = SAMPLES[Math.floor(Math.random() * SAMPLES.length)]
+    const id = Math.random().toString(36).slice(2, 8)
+    const set = (field: string, value: string) => {
+      const el = form.elements.namedItem(field) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null
+      if (el) el.value = value
+    }
+    set('name', `${sample.name} (sample)`)
+    set('email', `sample-${id}@example.com`)
+    set('company', sample.company)
+    set('budget', BUDGETS[sample.budget])
+    set('message', sample.message)
+    setErrors({})
+  }
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -448,6 +504,7 @@ export function ContactForm() {
         setState('failed')
         return
       }
+      sendToAutoHub(data)
       setState('sent')
       requestAnimationFrame(() => sentRef.current?.focus())
     } catch {
@@ -464,7 +521,13 @@ export function ContactForm() {
       <div ref={sentRef} tabIndex={-1} className="py-10 outline-none">
         <h3 className="text-4xl tracking-[-0.02em]">Message sent</h3>
         <p className="mt-4 text-white/85 max-w-[36ch]">Thank you, {name}. We'll reply within one working day.</p>
-        <button type="button" className="mt-7 text-sm underline underline-offset-4" onClick={() => setState('idle')}>
+        <a href={AUTOHUB_URL} target="_blank" rel="noreferrer" className={`${glassBtn} mt-7`}>
+          Watch AutoHub answer it →
+        </a>
+        <p className="mt-3 text-sm text-white/60 max-w-[44ch]">
+          Choose "Explore the demo", then open Conversations. AutoHub's free server may take up to a minute to wake up.
+        </p>
+        <button type="button" className="mt-7 block text-sm underline underline-offset-4" onClick={() => setState('idle')}>
           Send another message
         </button>
       </div>
@@ -472,7 +535,16 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={submit} noValidate className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+    <form ref={formRef} onSubmit={submit} noValidate className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+      <div className="sm:col-span-2 mb-2 rounded-2xl border border-white/15 bg-white/[0.04] p-4 text-sm text-white/80">
+        <p>
+          <b className="text-white">This is a demo.</b> Your message is also answered by AutoHub, flowpath's AI assistant,
+          and shown on its public dashboard (email addresses are hidden). Don't include anything private.
+        </p>
+        <button type="button" onClick={fillSample} className="mt-3 underline underline-offset-4 text-white">
+          Try a sample enquiry
+        </button>
+      </div>
       <div>
         <label className={label} htmlFor="c-name">Your name</label>
         <input id="c-name" name="name" className="field" autoComplete="name" aria-invalid={!!errors.name} />
