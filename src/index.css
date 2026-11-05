@@ -9,7 +9,14 @@
 }
 
 html { scroll-behavior: smooth; }
-body { background: #17110E; color: #fff; }
+html { background: #0d0a08; }
+body { background: #120d0a; color: #fff; }
+
+/* Golden Hour: a warm, deep brown that settles into near-black as you scroll */
+.page-bg {
+  background: linear-gradient(180deg, #1d1511 0%, #140f0c 45%, #0d0a08 100%);
+}
+
 :focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 
 .liquid-glass {

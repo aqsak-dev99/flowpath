@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { ArrowUpRight, Check } from 'lucide-react'
 import { CASES, CHANNELS, FACTS, FAQS, ROLES, SERVICES, SITE, STEPS, TEAM, VALUES } from './data'
 import {
+  AUTOHUB_URL,
   ContactForm,
   Cover,
   CtaBand,
@@ -14,6 +15,7 @@ import {
   Section,
   ServiceVisual,
   card,
+  eyebrowCls,
   glassBtn,
   pad,
   usePageTitle,
@@ -26,17 +28,16 @@ function Hero() {
   return (
     <section className="relative h-screen min-h-[620px] w-full overflow-hidden flex flex-col">
       <video className="absolute inset-0 w-full h-full object-cover" src={SITE.video} autoPlay loop muted playsInline aria-hidden="true" />
-      <div className="absolute inset-0 bg-black/10" aria-hidden="true" />
-      <div className="relative z-10 flex-1 flex items-start justify-center px-5 pt-36 sm:pt-40 md:pt-44">
-        <div className="text-center max-w-3xl">
-          <h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-[1.05] tracking-[-0.02em]">
-            Reach the
-            <br />
-            right people. <span className="text-white/60">Skip the</span>
-            <br />
-            <span className="text-white/60">guesswork.</span>
+      {/* Darkens the centre so the headline reads clearly over the film, then fades into the page */}
+      <div className="absolute inset-0 bg-[radial-gradient(60%_65%_at_50%_45%,rgba(15,11,9,0.82)_0%,rgba(15,11,9,0.4)_60%,rgba(15,11,9,0.08)_100%)]" aria-hidden="true" />
+      <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-b from-transparent to-[#1d1511]" aria-hidden="true" />
+      <div className="relative z-10 flex-1 flex items-center justify-center px-5 pt-24">
+        <div className="text-center max-w-4xl">
+          <p className={`${eyebrowCls} mb-6`}>Digital marketing studio · Lahore</p>
+          <h1 className="text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem] leading-[1] tracking-[-0.035em]">
+            Reach the right people. <span className="text-[#c9bfb5]">Skip the guesswork.</span>
           </h1>
-          <p className="text-white/80 text-sm sm:text-base md:text-lg leading-relaxed max-w-md mx-auto mt-6 sm:mt-8">
+          <p className="text-[#ece5dd] text-base md:text-lg leading-relaxed max-w-xl mx-auto mt-7 sm:mt-8">
             Flowpath plans, makes and runs your marketing across every channel, so your team spends less time guessing and more time growing.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-6 sm:mt-8">
@@ -67,7 +68,7 @@ function Flow() {
           {ys.map((y, i) => (
             <g key={CHANNELS[i]}>
               <path d={`M270 ${y} C 380 ${y}, 380 200, 470 200`} fill="none" stroke="white" strokeOpacity="0.16" strokeWidth="2" />
-              <path className="flow-line" d={`M270 ${y} C 380 ${y}, 380 200, 470 200`} fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" style={{ animationDelay: `${-i * 0.6}s` }} />
+              <path className="flow-line" d={`M270 ${y} C 380 ${y}, 380 200, 470 200`} fill="none" stroke="#F2B632" strokeWidth="2" strokeLinecap="round" style={{ animationDelay: `${-i * 0.6}s` }} />
               <rect x="10" y={y - 26} width="260" height="52" rx="26" fill="white" fillOpacity="0.06" stroke="white" strokeOpacity="0.25" />
               <text x="140" y={y + 6} textAnchor="middle" fill="white" fontSize="17" fontWeight="500">
                 {CHANNELS[i]}
@@ -75,7 +76,7 @@ function Flow() {
             </g>
           ))}
           <path d="M610 200 H 770" fill="none" stroke="white" strokeOpacity="0.16" strokeWidth="6" />
-          <path className="flow-line" d="M610 200 H 770" fill="none" stroke="white" strokeWidth="6" strokeLinecap="round" />
+          <path className="flow-line" d="M610 200 H 770" fill="none" stroke="#F2B632" strokeWidth="6" strokeLinecap="round" />
           <rect x="470" y="160" width="140" height="80" rx="40" fill="white" />
           <text x="540" y="206" textAnchor="middle" fill="#17110E" fontSize="18" fontWeight="600">
             One plan
@@ -116,14 +117,15 @@ function ServiceCards() {
         }
       />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {SERVICES.map((service) => (
+        {SERVICES.map((service, i) => (
           <Link key={service.id} to={`/services#${service.id}`} className={`group ${card} p-6 lg:p-8 flex flex-col transition-colors duration-300 hover:bg-white/[0.07]`}>
             <ServiceVisual kind={service.visual} caption={service.caption} />
-            <h3 className="mt-7 text-2xl tracking-[-0.01em] flex items-center justify-between gap-3">
+            <p className="mt-7 text-xs font-semibold tracking-[0.12em] text-[#F2B632]">0{i + 1}</p>
+            <h3 className="mt-2 text-2xl tracking-[-0.01em] flex items-center justify-between gap-3">
               {service.name}
               <ArrowUpRight className="w-5 h-5 text-white/40 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-white" aria-hidden="true" />
             </h3>
-            <p className="mt-3 text-white/70 text-[15px] leading-relaxed">{service.short}</p>
+            <p className="mt-3 text-[#b9afa6] text-[15px] leading-relaxed">{service.short}</p>
           </Link>
         ))}
       </div>
@@ -135,7 +137,7 @@ function Statement() {
   return (
     <section className="relative isolate overflow-hidden">
       <Film className="absolute inset-0 w-full h-full object-cover" />
-      <div className="relative bg-[#17110E] mix-blend-darken py-16 md:py-24 flex items-center justify-center">
+      <div className="relative bg-[#140f0c] mix-blend-darken py-16 md:py-24 flex items-center justify-center">
         <p className="text-white text-center font-bold leading-[0.9] tracking-[-0.045em] text-[19vw] md:text-[14vw]">
           Seen.
           <br />
@@ -153,6 +155,7 @@ function FeaturedResult() {
   return (
     <Section>
       <Heading
+        eyebrow="Case study"
         lead={featured.duration}
         rest={`with ${featured.client}.`}
         lede={featured.brief}
@@ -209,11 +212,73 @@ function Voices() {
   )
 }
 
+function ClientStrip() {
+  return (
+    <section aria-label="Clients" className={`${pad} border-y border-white/10`}>
+      <div className="mx-auto max-w-6xl py-6 flex flex-wrap items-center justify-between gap-x-10 gap-y-3">
+        <span className="text-sm text-[#a99d92]">Trusted by growing brands in Lahore</span>
+        <ul className="flex flex-wrap gap-x-10 gap-y-2 text-lg md:text-xl font-medium text-[#e6ded6]">
+          {CASES.map((item) => (
+            <li key={item.slug}>
+              <Link to={`/work/${item.slug}`} className="hover:text-white">
+                {item.client}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+/** Shows AutoHub, the AI assistant that answers contact-form enquiries in four languages. */
+function AskSection() {
+  return (
+    <Section>
+      <div className={`${card} !rounded-[2rem] p-7 md:p-12 lg:p-16 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center`}>
+        <div>
+          <p className={`${eyebrowCls} mb-4`}>Meet AutoHub</p>
+          <h2 className="text-3xl sm:text-4xl md:text-[2.75rem] leading-[1.08] tracking-[-0.025em]">
+            Every enquiry answered fast, <span className="text-[#b9afa6]">in your language.</span>
+          </h2>
+          <p className="mt-5 text-[#b9afa6] text-base md:text-[17px] leading-relaxed max-w-[44ch]">
+            Our AI assistant drafts a reply to every message in English, Urdu, Roman Urdu or Arabic, and hands it to a person when it isn't sure.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link to="/contact" className={whiteBtn}>
+              Try a sample enquiry
+            </Link>
+            <a href={AUTOHUB_URL} target="_blank" rel="noreferrer" className={glassBtn}>
+              Watch AutoHub work
+            </a>
+          </div>
+        </div>
+        <figure className="rounded-3xl bg-[#0d0a08] border border-white/10 p-5 md:p-6">
+          <figcaption className="pb-4 mb-4 border-b border-white/10 text-sm font-semibold flex items-center justify-between">
+            <span>New enquiry</span>
+            <span className="text-xs font-medium text-[#a99d92]">Example</span>
+          </figcaption>
+          <div className="grid gap-3 text-[15px] leading-relaxed">
+            <p className="justify-self-end max-w-[85%] rounded-[1.1rem] rounded-br-md bg-[#2b211b] px-4 py-3">
+              Salam, hamari bakery ke liye Instagram content aur ads chahiye. Kab start kar sakte hain?
+            </p>
+            <p className="justify-self-start max-w-[85%] rounded-[1.1rem] rounded-bl-md bg-white text-[#15100c] px-4 py-3">
+              Walaikum assalam! Zaroor. Hum is hafte ek chhoti call rakh sakte hain taake aap ke budget aur goals samajh sakein.
+            </p>
+            <p className="mt-1 text-xs text-[#a99d92]">Drafted by AutoHub · checked by the team before sending</p>
+          </div>
+        </figure>
+      </div>
+    </Section>
+  )
+}
+
 export function Home() {
   usePageTitle()
   return (
     <>
       <Hero />
+      <ClientStrip />
       <Flow />
       <ServiceCards />
       <Statement />
@@ -223,6 +288,7 @@ export function Home() {
         <WorkRows />
       </Section>
       <Voices />
+      <AskSection />
       <CtaBand />
     </>
   )

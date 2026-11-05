@@ -11,6 +11,10 @@ export const glassBtn =
   'inline-flex items-center justify-center px-6 py-3 liquid-glass rounded-full text-white text-sm font-semibold hover:bg-white/10'
 export const card = 'rounded-3xl bg-white/[0.04] border border-white/10'
 
+/** Golden Hour accent: used sparingly for labels, numbers and data lines. */
+export const GOLD = '#F2B632'
+export const eyebrowCls = 'text-xs font-semibold tracking-[0.14em] uppercase text-[#F2B632]'
+
 /* ---------- hooks ---------- */
 
 export const prefersReducedMotion = () =>
@@ -85,13 +89,16 @@ export function Section({ id, children, className = '' }: { id?: string; childre
 }
 
 /** Two-tone heading, the same device as the hero headline. */
-export function Heading({ lead, rest, lede, action }: { lead: string; rest?: string; lede?: string; action?: ReactNode }) {
+export function Heading({ lead, rest, lede, action, eyebrow }: { lead: string; rest?: string; lede?: string; action?: ReactNode; eyebrow?: string }) {
   return (
     <div className="mb-12 md:mb-16 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-      <h2 className="text-3xl sm:text-4xl md:text-5xl leading-[1.05] tracking-[-0.02em] max-w-[18ch]">
-        {lead} {rest && <span className="text-white/50">{rest}</span>}
-      </h2>
-      {lede && <p className="text-white/70 text-base leading-relaxed max-w-[40ch]">{lede}</p>}
+      <div>
+        {eyebrow && <p className={`${eyebrowCls} mb-4`}>{eyebrow}</p>}
+        <h2 className="text-3xl sm:text-4xl md:text-5xl leading-[1.06] tracking-[-0.025em] max-w-[22ch]">
+          {lead} {rest && <span className="text-[#b9afa6]">{rest}</span>}
+        </h2>
+      </div>
+      {lede && <p className="text-[#b9afa6] text-base md:text-[17px] leading-relaxed max-w-[42ch]">{lede}</p>}
       {action}
     </div>
   )
@@ -102,8 +109,8 @@ export function PageHeader({ lead, rest, lede, children }: { lead: string; rest?
   return (
     <header className={`${pad} pt-36 md:pt-44 pb-12 md:pb-16`}>
       <div className="mx-auto max-w-6xl">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.03] tracking-[-0.025em] max-w-[16ch]">
-          {lead} {rest && <span className="text-white/50">{rest}</span>}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4rem] leading-[1.03] tracking-[-0.025em] max-w-[18ch]">
+          {lead} {rest && <span className="text-[#b9afa6]">{rest}</span>}
         </h1>
         {lede && <p className="mt-7 text-white/75 text-base md:text-lg leading-relaxed max-w-[52ch]">{lede}</p>}
         {children}
@@ -138,7 +145,7 @@ export function Metrics({ items }: { items: { to: number; decimals: number; suff
         <div key={metric.label} className="border-t border-white/20 pt-5">
           <dd className="text-6xl md:text-7xl tracking-[-0.03em] leading-none">
             <Count to={metric.to} decimals={metric.decimals} />
-            <span className="text-white/50">{metric.suffix}</span>
+            <span className="text-[#F2B632]">{metric.suffix}</span>
           </dd>
           <dt className="mt-3 text-base text-white/70">{metric.label}</dt>
         </div>
@@ -180,8 +187,8 @@ export function LineChart({ title, unit, labels, values }: { title: string; unit
       <svg viewBox={`0 0 ${box.w} ${box.h}`} className="block w-full h-auto" role="img" aria-label={summary}>
         <defs>
           <linearGradient id={gradient} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="white" stopOpacity="0.28" />
-            <stop offset="1" stopColor="white" stopOpacity="0" />
+            <stop offset="0" stopColor={GOLD} stopOpacity="0.3" />
+            <stop offset="1" stopColor={GOLD} stopOpacity="0" />
           </linearGradient>
         </defs>
         {[0, 1, 2, 3].map((i) => {
@@ -193,7 +200,7 @@ export function LineChart({ title, unit, labels, values }: { title: string; unit
           d={line}
           pathLength={1}
           fill="none"
-          stroke="white"
+          stroke={GOLD}
           strokeWidth="3.5"
           strokeLinecap="round"
           style={{ strokeDasharray: 1, strokeDashoffset: seen ? 0 : 1, transition: 'stroke-dashoffset 1.8s ease-out' }}
@@ -279,8 +286,8 @@ function BarsVisual() {
       {bars.map((height, i) => (
         <div
           key={i}
-          className="flex-1 rounded-t-lg bg-white transition-all duration-700 ease-out"
-          style={{ height: seen ? `${height}%` : '4%', opacity: 0.25 + (i / bars.length) * 0.75, transitionDelay: `${i * 70}ms` }}
+          className={`flex-1 rounded-t-lg transition-all duration-700 ease-out ${i === bars.length - 1 ? 'bg-[#F2B632]' : 'bg-white'}`}
+          style={{ height: seen ? `${height}%` : '4%', opacity: i === bars.length - 1 ? 1 : 0.2 + (i / bars.length) * 0.6, transitionDelay: `${i * 70}ms` }}
         />
       ))}
     </div>
@@ -381,10 +388,11 @@ export function CtaBand() {
   return (
     <section className={`relative overflow-hidden ${pad} py-24 md:py-32 text-center`}>
       <Film className="absolute inset-0 w-full h-full object-cover" />
-      <div className="absolute inset-0 bg-black/45" aria-hidden="true" />
+      <div className="absolute inset-0 bg-[radial-gradient(60%_70%_at_50%_50%,rgba(15,11,9,0.88)_0%,rgba(15,11,9,0.5)_70%,rgba(15,11,9,0.25)_100%)]" aria-hidden="true" />
+      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#0d0a08] to-transparent" aria-hidden="true" />
       <div className="relative mx-auto max-w-3xl">
-        <h2 className="text-4xl sm:text-5xl md:text-6xl leading-[1.05] tracking-[-0.02em]">
-          Tell us what <span className="text-white/60">you're launching.</span>
+        <h2 className="text-4xl sm:text-5xl md:text-6xl leading-[1.05] tracking-[-0.025em]">
+          Tell us what <span className="text-[#c9bfb5]">you're launching.</span>
         </h2>
         <p className="mt-6 mx-auto max-w-[44ch] text-white/85 leading-relaxed">
           We reply to every message within one working day, usually with a few questions and a time to talk.
